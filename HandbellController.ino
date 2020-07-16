@@ -220,15 +220,21 @@ static Accelerometer* CreateAccelerometer()
         {
             switch (address)
             {
+#ifdef ENABLE_LIS3DH
                 case ADDR_18_LIS3DH:
                 case ADDR_19_LIS3DH:
                     return new LIS3DHAccelerometer(address);
+#endif
+#ifdef ENABLE_ADXL345
                 case ADDR_1D_ADXL345:
                 case ADDR_53_ADXL345:
                     return new ADXL345Accelerometer(address);
+#endif
+#ifdef ENABLE_MPU6050
                 case ADDR_68_MPU9250:
                 case ADDR_69_MPU9250:
                     return new MPU6050Accelerometer(address);
+#endif
             }
         }
     }
