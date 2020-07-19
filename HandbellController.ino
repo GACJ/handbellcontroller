@@ -1,16 +1,12 @@
-#define ENABLE_LIS3DH
-#define ENABLE_MPU6050
-#define ENABLE_ADXL345
-
+#include "HandbellController.h"
 #include "Joystick.h"
+#include "MPU6050YPRAccelerometer.h"
 #include <Wire.h>
 
 #ifdef ENABLE_LIS3DH
 #include <Adafruit_LIS3DH.h>
 #include <Adafruit_Sensor.h>
 #endif
-
-typedef Joystick_ Joystick;
 
 enum
 {
@@ -20,22 +16,6 @@ enum
     ADDR_53_ADXL345 = 0x53,
     ADDR_68_MPU9250 = 0x68,
     ADDR_69_MPU9250 = 0x69,
-};
-
-typedef enum
-{
-    ACCEL_NONE,
-    ACCEL_LIS3DH,
-    ACCEL_MPU6050,
-    ACCEL_ADXL345
-} accel_t;
-
-class Accelerometer
-{
-public:
-    virtual accel_t GetType() const = 0;
-    virtual void Setup(Joystick*) = 0;
-    virtual void Update(Joystick*) = 0;
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -230,10 +210,14 @@ static Accelerometer* CreateAccelerometer()
                 case ADDR_53_ADXL345:
                     return new ADXL345Accelerometer(address);
 #endif
-#ifdef ENABLE_MPU6050
+#if defined(ENABLE_MPU6050)
                 case ADDR_68_MPU9250:
                 case ADDR_69_MPU9250:
                     return new MPU6050Accelerometer(address);
+#elif defined(ENABLE_MPU6050_YPR)
+                case ADDR_68_MPU9250:
+                case ADDR_69_MPU9250:
+                    return new MPU6050YPRAccelerometer(address);
 #endif
             }
         }
@@ -268,6 +252,11 @@ void setup()
     if (gAccelerometer != nullptr)
     {
         bool hasGyro = gAccelerometer->GetType() == ACCEL_MPU6050;
+#ifdef ENABLE_MPU6050_YPR
+        bool hasYPR = false;
+#else
+        bool hasYPR = false;
+#endif
         gJoystick = new Joystick(
             JOYSTICK_DEFAULT_REPORT_ID,
             JOYSTICK_TYPE_JOYSTICK,
@@ -279,9 +268,9 @@ void setup()
             hasGyro,
             hasGyro,
             hasGyro,
-            false,
-            false,
-            false,
+            hasYPR,
+            hasYPR,
+            hasYPR,
             false,
             false);
         gAccelerometer->Setup(gJoystick);
