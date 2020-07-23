@@ -166,9 +166,9 @@ public:
         Wire.write(0);                         // Set 10-bit mode with range -2g..+2g
         Wire.endTransmission();
 
-        joystick->setXAxisRange(-256, 255);
-        joystick->setYAxisRange(-256, 255);
-        joystick->setZAxisRange(-256, 255);
+        joystick->setXAxisRange(-512, 511);
+        joystick->setYAxisRange(-512, 511);
+        joystick->setZAxisRange(-512, 511);
     }
 
     void Update(Joystick* joystick) override
