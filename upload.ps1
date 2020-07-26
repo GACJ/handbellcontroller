@@ -1,3 +1,5 @@
+$hexPath = "HandbellController\HandbellController.ino.leonardo.hex"
+
 $avrPath = "C:\Program Files (x86)\Arduino\hardware\tools\avr"
 if (-not (Test-Path $avrPath)) {
     Write-Host -ForegroundColor Red  "Arduino tools not found"
@@ -16,8 +18,7 @@ if ($devices.Length -eq 1) {
     $port = $newDevices
 
     Write-Host "Flashing over $port"
-    $filename = "HandbellController.ino.leonardo.hex"
-    & "$avrPath\bin\avrdude.exe" -C "$avrPath\etc\avrdude.conf" -p atmega32u4  -c avr109 -P $port -b 57600 -D -U ("flash:w:" + $filename + ":i")
+    & "$avrPath\bin\avrdude.exe" -C "$avrPath\etc\avrdude.conf" -p atmega32u4  -c avr109 -P $port -b 57600 -D -U ("flash:w:" + $hexPath + ":i")
     if ($LASTEXITCODE -eq 0) {
         Write-Host -ForegroundColor Green "Arduino flash succeeded"
         exit 0
