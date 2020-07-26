@@ -1,8 +1,8 @@
 #pragma once
 
 // #define ENABLE_LIS3DH
-// #define ENABLE_MPU6050
-#define ENABLE_MPU6050_YPR
+#define ENABLE_MPU6050
+// #define ENABLE_MPU6050_YPR
 #define ENABLE_ADXL345
 
 typedef enum
