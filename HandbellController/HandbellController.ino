@@ -232,6 +232,9 @@ static Accelerometer* gAccelerometer;
 
 static uint32_t _lastTime = 0;
 static uint32_t _lightState = 0;
+static int16_t _lastX = 0;
+static int16_t _lastY = 0;
+static int16_t _lastZ = 0;
 static bool _blinkOff = false;
 
 static void SetupButtons()
@@ -276,13 +279,16 @@ static void UpdateLights(Joystick* joystick)
                     showLight = joystick->getButton(1);
                     break;
                 case 2:
-                    showLight = joystick->getXAxis() != 0;
+                    showLight = joystick->getXAxis() != _lastX;
+                    _lastX = joystick->getXAxis();
                     break;
                 case 3:
-                    showLight = joystick->getYAxis() != 0;
+                    showLight = joystick->getYAxis() != _lastY;
+                    _lastY = joystick->getYAxis();
                     break;
                 case 4:
-                    showLight = joystick->getZAxis() != 0;
+                    showLight = joystick->getZAxis() != _lastZ;
+                    _lastZ = joystick->getZAxis();
                     break;
                 case 5:
                 case 6:
