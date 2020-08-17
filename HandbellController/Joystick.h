@@ -212,6 +212,11 @@ public:
 	void setHatSwitch(int8_t hatSwitch, int16_t value);
 
 	void sendState();
+
+	bool getButton(uint8_t button) const;
+	int16_t getXAxis() const { return _xAxis; }
+	int16_t getYAxis() const { return _yAxis; }
+	int16_t getZAxis() const { return _zAxis; }
 };
 
 #endif // !defined(_USING_DYNAMIC_HID)

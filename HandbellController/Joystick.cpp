@@ -517,6 +517,16 @@ void Joystick_::releaseButton(uint8_t button)
 	if (_autoSendState) sendState();
 }
 
+bool Joystick_::getButton(uint8_t button) const
+{
+    if (button >= _buttonCount) return false;
+
+    int index = button / 8;
+    int bit = button % 8;
+
+    return (_buttonValues[index] & (1 << bit)) != 0;
+}
+
 void Joystick_::setXAxis(int16_t value)
 {
 	_xAxis = value;

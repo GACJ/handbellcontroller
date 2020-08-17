@@ -225,8 +225,14 @@ static Accelerometer* CreateAccelerometer()
     return nullptr;
 }
 
+constexpr int LED_PIN = 17;
+
 static Joystick* gJoystick;
 static Accelerometer* gAccelerometer;
+
+static uint32_t _lastTime = 0;
+static uint32_t _lightState = 0;
+static bool _blinkOff = false;
 
 static void SetupButtons()
 {
@@ -242,11 +248,67 @@ static void UpdateButtons(Joystick* joystick)
     joystick->setButton(1, btn1);
 }
 
+static void SetupLights()
+{
+    pinMode(LED_PIN, OUTPUT);
+}
+
+static void UpdateLights(Joystick* joystick)
+{
+    auto currentTime = millis();
+    if (currentTime > _lastTime + 500)
+    {
+        _lastTime = currentTime;
+
+        auto showLight = false;
+        if (_blinkOff)
+        {
+            _blinkOff = false;
+        }
+        else
+        {
+            switch (_lightState)
+            {
+                case 0:
+                    showLight = joystick->getButton(0);
+                    break;
+                case 1:
+                    showLight = joystick->getButton(1);
+                    break;
+                case 2:
+                    showLight = joystick->getXAxis() != 0;
+                    break;
+                case 3:
+                    showLight = joystick->getYAxis() != 0;
+                    break;
+                case 4:
+                    showLight = joystick->getZAxis() != 0;
+                    break;
+                case 5:
+                case 6:
+                    // Restart delay
+                    break;
+                default:
+                    _lightState = -1;
+                    break;
+            }
+            _lightState++;
+            _blinkOff = true;
+        }
+
+        if (showLight)
+            digitalWrite(LED_PIN, 0);
+        else
+            digitalWrite(LED_PIN, 1);
+    }
+}
+
 void setup()
 {
     Wire.begin();
 
     SetupButtons();
+    SetupLights();
 
     gAccelerometer = CreateAccelerometer();
     if (gAccelerometer != nullptr)
@@ -308,7 +370,6 @@ void loop()
     }
 
     UpdateButtons(gJoystick);
+    UpdateLights(gJoystick);
     gJoystick->sendState();
-
-    delay(5);
 }
