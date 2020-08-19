@@ -1,8 +1,9 @@
 $hexPath = "HandbellController\HandbellController.ino.leonardo.hex"
 
-$avrPath = "C:\Program Files (x86)\Arduino\hardware\tools\avr"
+# $avrPath = "C:\Program Files (x86)\Arduino\hardware\tools\avr"
+$avrPath = "HandbellController\avr"
 if (-not (Test-Path $avrPath)) {
-    Write-Host -ForegroundColor Red  "Arduino tools not found"
+    Write-Host -ForegroundColor Red  "avrdude.exe path not found"
     exit 1
 }
 
