@@ -1,6 +1,7 @@
 #include "HandbellController.h"
 #include "Joystick.h"
 #include "MPU6050YPRAccelerometer.h"
+#include <EEPROM.h>
 #include <Wire.h>
 
 #ifdef ENABLE_LIS3DH
@@ -226,6 +227,13 @@ static Accelerometer* CreateAccelerometer()
 }
 
 constexpr int LED_PIN = 17;
+constexpr int CALIBRATION_HOLD_TIME = 5 * 1000; // 20 seconds
+constexpr char* EEPROM_MAGIC = "eBells  ";
+
+struct SavedConfig {
+    char magic[8];
+    Vec3 acc, gyro;
+};
 
 static Joystick* gJoystick;
 static Accelerometer* gAccelerometer;
@@ -236,6 +244,10 @@ static int16_t _lastX = 0;
 static int16_t _lastY = 0;
 static int16_t _lastZ = 0;
 static bool _blinkOff = false;
+static bool _buttonState[2];
+static uint32_t _calibrationHoldTime = 0;
+static bool _calibrationMode = false;
+static SavedConfig _config;
 
 static void SetupButtons()
 {
@@ -245,10 +257,10 @@ static void SetupButtons()
 
 static void UpdateButtons(Joystick* joystick)
 {
-    int btn0 = !digitalRead(10);
-    int btn1 = !digitalRead(9);
-    joystick->setButton(0, btn0);
-    joystick->setButton(1, btn1);
+    _buttonState[0] = !digitalRead(10);
+    _buttonState[1] = !digitalRead(9);
+    joystick->setButton(0, _buttonState[0]);
+    joystick->setButton(1, _buttonState[1]);
 }
 
 static void SetupLights()
@@ -309,10 +321,58 @@ static void UpdateLights(Joystick* joystick)
     }
 }
 
+static void SaveCalibration()
+{
+    strncpy(_config.magic, EEPROM_MAGIC, 8);
+    EEPROM.put(0, _config);
+}
+
+static void LoadCalibration()
+{
+    EEPROM.get(0, _config);
+    if (memcmp(_config.magic, EEPROM_MAGIC, 8) != 0)
+    {
+        memset(&_config, 0, sizeof(_config));
+        SaveCalibration();
+    }
+}
+
+static bool UpdateCalibrationMode()
+{
+    if (_calibrationMode)
+    {
+        if (!calibration_loop())
+        {
+            calibration_get(&_config.acc, &_config.gyro);
+            SaveCalibration();
+            _calibrationMode = false;
+        }
+    }
+    else
+    {
+        // Check if both buttons are held down long enough to enter calibration mode
+        auto currentTime = millis();
+        if (_buttonState[0] && _buttonState[1])
+        {
+            if (currentTime > _calibrationHoldTime + CALIBRATION_HOLD_TIME)
+            {
+                _calibrationMode = true;
+                calibration_setup();
+            }
+        }
+        else
+        {
+            _calibrationHoldTime = currentTime;
+        }
+    }
+    return _calibrationMode;
+}
+
 void setup()
 {
     Wire.begin();
 
+    LoadCalibration();
     SetupButtons();
     SetupLights();
 
@@ -370,12 +430,15 @@ void setup()
 
 void loop()
 {
-    if (gAccelerometer != nullptr)
+    if (!UpdateCalibrationMode())
     {
-        gAccelerometer->Update(gJoystick);
-    }
+        if (gAccelerometer != nullptr)
+        {
+            gAccelerometer->Update(gJoystick);
+        }
 
-    UpdateButtons(gJoystick);
-    UpdateLights(gJoystick);
-    gJoystick->sendState();
+        UpdateButtons(gJoystick);
+        UpdateLights(gJoystick);
+        gJoystick->sendState();
+    }
 }

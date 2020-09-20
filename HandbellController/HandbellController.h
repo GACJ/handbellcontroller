@@ -23,3 +23,12 @@ public:
     virtual void Setup(Joystick*) = 0;
     virtual void Update(Joystick*) = 0;
 };
+
+struct Vec3
+{
+    int x, y, z;
+};
+
+void calibration_setup();
+bool calibration_loop();
+void calibration_get(Vec3* acc, Vec3* gyro);
