@@ -15,7 +15,7 @@ public:
 
     accel_t GetType() const override { return ACCEL_MPU6050; }
 
-    void Setup(Joystick* joystick) override;
+    void Setup(Joystick* joystick, const SavedConfig* config) override;
     void Update(Joystick* joystick) override;
 };
 

@@ -155,7 +155,7 @@ public:
 
     accel_t GetType() const override { return ACCEL_ADXL345; }
 
-    void Setup(Joystick* joystick) override
+    void Setup(Joystick* joystick, const SavedConfig* config) override
     {
         Wire.beginTransmission(_address);
         Wire.write(ADXL345_POWER_CTL); // Access / talk to POWER_CTL Register - 0x2D
@@ -227,13 +227,8 @@ static Accelerometer* CreateAccelerometer()
 }
 
 constexpr int LED_PIN = 17;
-constexpr int CALIBRATION_HOLD_TIME = 5 * 1000; // 20 seconds
+constexpr int CALIBRATION_HOLD_TIME = 20 * 1000; // 20 seconds
 constexpr char* EEPROM_MAGIC = "eBells  ";
-
-struct SavedConfig {
-    char magic[8];
-    Vec3 acc, gyro;
-};
 
 static Joystick* gJoystick;
 static Accelerometer* gAccelerometer;
@@ -401,7 +396,7 @@ void setup()
             hasYPR,
             false,
             false);
-        gAccelerometer->Setup(gJoystick);
+        gAccelerometer->Setup(gJoystick, &_config);
     }
     else
     {

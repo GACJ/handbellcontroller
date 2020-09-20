@@ -16,17 +16,23 @@ typedef enum
 class Joystick_;
 typedef Joystick_ Joystick;
 
+struct Vec3
+{
+    int x, y, z;
+};
+
+struct SavedConfig
+{
+    char magic[8];
+    Vec3 acc, gyro;
+};
+
 class Accelerometer
 {
 public:
     virtual accel_t GetType() const = 0;
-    virtual void Setup(Joystick*) = 0;
+    virtual void Setup(Joystick*, const SavedConfig*) = 0;
     virtual void Update(Joystick*) = 0;
-};
-
-struct Vec3
-{
-    int x, y, z;
 };
 
 void calibration_setup();

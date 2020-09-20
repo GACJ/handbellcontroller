@@ -30,7 +30,7 @@ static void dmpDataReady()
     mpuInterrupt = true;
 }
 
-void MPU6050YPRAccelerometer::Setup(Joystick* joystick)
+void MPU6050YPRAccelerometer::Setup(Joystick* joystick, const SavedConfig* config)
 {
     mpu.initialize();
     delay(500);
@@ -39,12 +39,12 @@ void MPU6050YPRAccelerometer::Setup(Joystick* joystick)
     devStatus = mpu.dmpInitialize();
 
     // supply your own gyro calibration offsets here, scaled for min sensitivity
-    mpu.setXAccelOffset(0);
-    mpu.setYAccelOffset(0);
-    mpu.setZAccelOffset(0);
-    mpu.setXGyroOffset(0);
-    mpu.setYGyroOffset(0);
-    mpu.setZGyroOffset(0);
+    mpu.setXAccelOffset(config->acc.x);
+    mpu.setYAccelOffset(config->acc.y);
+    mpu.setZAccelOffset(config->acc.z);
+    mpu.setXGyroOffset(config->gyro.x);
+    mpu.setYGyroOffset(config->gyro.y);
+    mpu.setZGyroOffset(config->gyro.z);
     
     // turn on the DMP, now that it's ready
     mpu.setDMPEnabled(true);
