@@ -359,6 +359,13 @@ static bool UpdateCalibrationMode()
         {
             _calibrationHoldTime = currentTime;
         }
+        // Alternatively check if there is serial input and enter calibration mode if so
+        // This permits calibration of devices that do not have buttons
+		    if (Serial.available()){ // there is input
+            while (Serial.read()!=-1); // empty out the input buffer
+			      _calibrationMode = true;
+			      calibration_setup();
+		    }
     }
     return _calibrationMode;
 }
