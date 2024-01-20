@@ -4,12 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${vcpkgRoot}/x64-windows-winssl/include",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\avr\\include",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\tools\\avr\\avr\\include\\avr",
-                "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\variants\\leonardo"
+                "${env.LOCALAPPDATA}/Arduino15/packages/arduino/**"
             ],
             "defines": [
                 "_DEBUG",
