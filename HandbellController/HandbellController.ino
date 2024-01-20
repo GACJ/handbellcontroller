@@ -254,8 +254,15 @@ static void UpdateButtons(Joystick* joystick)
 {
     _buttonState[0] = !digitalRead(10);
     _buttonState[1] = !digitalRead(9);
+
+#ifdef SWAP_BUTTONS
+    // Swap buttons around for any e-bell that has them the wrong way round
+    joystick->setButton(0, _buttonState[1]);
+    joystick->setButton(1, _buttonState[0]);
+#else
     joystick->setButton(0, _buttonState[0]);
     joystick->setButton(1, _buttonState[1]);
+#endif
 }
 
 static void SetupLights()
